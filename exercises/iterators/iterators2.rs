@@ -11,20 +11,25 @@
 // Step 1.
 // Complete the `capitalize_first` function.
 // "hello" -> "Hello"
-pub fn capitalize_first(input: &str) -> String {
-    let mut c = input.chars();
-    match c.next() {
-        None => String::new(),
-        Some(first) => ???,
-    }
+pub fn capitalize_first(input: &str) -> String {  
+    let mut c = input.chars();  
+    match c.next() {  
+        None => String::new(),  
+        Some(first) => {  
+            // 使用 collect 方法将剩余的字符收集为一个字符串  
+            let rest: String = c.collect();  
+            let mut result = first.to_uppercase().to_string();  
+            result.push_str(&rest);  
+            result  
+        }  
+    }  
 }
-
 // Step 2.
 // Apply the `capitalize_first` function to a slice of string slices.
 // Return a vector of strings.
 // ["hello", "world"] -> ["Hello", "World"]
 pub fn capitalize_words_vector(words: &[&str]) -> Vec<String> {
-    vec![]
+    words.iter().map(|&word| capitalize_first(word)).collect()
 }
 
 // Step 3.
@@ -32,8 +37,13 @@ pub fn capitalize_words_vector(words: &[&str]) -> Vec<String> {
 // Return a single string.
 // ["hello", " ", "world"] -> "Hello World"
 pub fn capitalize_words_string(words: &[&str]) -> String {
-    String::new()
+    words
+        .iter()
+        .map(|&word| capitalize_first(word))
+        .collect::<Vec<String>>()
+        .join(" ")
 }
+
 
 #[cfg(test)]
 mod tests {
