@@ -6,8 +6,6 @@
 // Execute `rustlings hint iterators2` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 // Step 1.
 // Complete the `capitalize_first` function.
 // "hello" -> "Hello"
@@ -41,7 +39,7 @@ pub fn capitalize_words_string(words: &[&str]) -> String {
         .iter()
         .map(|&word| capitalize_first(word))
         .collect::<Vec<String>>()
-        .join(" ")
+        .join("")
 }
 
 
