@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -29,13 +28,12 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
-
-impl<T: std::cmp::PartialOrd + PartialEq> LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -43,7 +41,6 @@ impl<T: std::cmp::PartialOrd + PartialEq> LinkedList<T> {
             end: None,
         }
     }
-
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
         node.next = None;
@@ -69,40 +66,43 @@ impl<T: std::cmp::PartialOrd + PartialEq> LinkedList<T> {
             },
         }
     }
-    
-	pub fn merge(mut list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self {
-        let mut merged_list = LinkedList::new();
-        let mut a_current = list_a.start;
-        let mut b_current = list_b.start;
-    
-        while a_current.is_some() && b_current.is_some() {
-            let a_node = unsafe { a_current.unwrap().as_ref() };
-            let b_node = unsafe { b_current.unwrap().as_ref() };
-            
-            if a_node.val < b_node.val {
-                merged_list.add(a_node.val);
-                a_current = a_node.next;
-            } else {
-                merged_list.add(b_node.val);
-                b_current = b_node.next;
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self {
+        // Create a new LinkedList to store the merged elements
+        let mut res: Self = Self::new();
+        // Start from the heads of both lists
+        let (mut list1, mut list2) = (list_a.start, list_b.start); 
+
+        // Iterate over both lists and compare elements
+        unsafe {
+            while list1.is_some() && list2.is_some() {
+                // Clone values to avoid moving ownership
+                let list1_v = list1.unwrap().as_ref().val.clone();
+                let list2_v = list2.unwrap().as_ref().val.clone();
+
+                // Compare values and add the smaller one to the result list
+                if list1_v < list2_v {
+                    res.add(list1_v.clone());
+                    list1 = (*list1.unwrap().as_ptr()).next;
+                } else {
+                    res.add(list2_v.clone());
+                    list2 = (*list2.unwrap().as_ptr()).next;
+                }
+            }
+            // Add remaining elements from list_a, if any
+            while list1.is_some() {
+                res.add(list1.unwrap().as_ref().val.clone());
+                list1 = (*list1.unwrap().as_ptr()).next;
+            }
+            // Add remaining elements from list_b, if any
+            while list2.is_some() {
+                res.add(list2.unwrap().as_ref().val.clone());
+                list2 = (*list2.unwrap().as_ptr()).next;
             }
         }
-    
-        while let Some(cursor) = a_current {
-            let val = unsafe { cursor.as_ref().val };
-            merged_list.add(val);
-            a_current = unsafe { cursor.as_ref().next };
-        }
-    
-        while let Some(cursor) = b_current {
-            let val = unsafe { cursor.as_ref().val };
-            merged_list.add(val);
-            b_current = unsafe { cursor.as_ref().next };
-        }
-    
-        merged_list
+        
+        // Return the merged list
+        res
     }
-    
 }
 
 impl<T> Display for LinkedList<T>
