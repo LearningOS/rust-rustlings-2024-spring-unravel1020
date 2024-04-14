@@ -35,7 +35,7 @@ impl<T> Default for LinkedList<T> {
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: std::cmp::PartialOrd + PartialEq> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,15 +69,40 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+    
+	pub fn merge(mut list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self {
+        let mut merged_list = LinkedList::new();
+        let mut a_current = list_a.start;
+        let mut b_current = list_b.start;
+    
+        while a_current.is_some() && b_current.is_some() {
+            let a_node = unsafe { a_current.unwrap().as_ref() };
+            let b_node = unsafe { b_current.unwrap().as_ref() };
+            
+            if a_node.val < b_node.val {
+                merged_list.add(a_node.val);
+                a_current = a_node.next;
+            } else {
+                merged_list.add(b_node.val);
+                b_current = b_node.next;
+            }
         }
-	}
+    
+        while let Some(cursor) = a_current {
+            let val = unsafe { cursor.as_ref().val };
+            merged_list.add(val);
+            a_current = unsafe { cursor.as_ref().next };
+        }
+    
+        while let Some(cursor) = b_current {
+            let val = unsafe { cursor.as_ref().val };
+            merged_list.add(val);
+            b_current = unsafe { cursor.as_ref().next };
+        }
+    
+        merged_list
+    }
+    
 }
 
 impl<T> Display for LinkedList<T>

@@ -27,35 +27,30 @@
 //
 // You should NOT modify any existing code except for adding two lines of attributes.
 
-// I AM NOT DONE
 
-extern "Rust" {
-    fn my_demo_function(a: u32) -> u32;
-    fn my_demo_function_alias(a: u32) -> u32;
-}
-
-mod Foo {
-    // No `extern` equals `extern "Rust"`.
-    fn my_demo_function(a: u32) -> u32 {
-        a
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_success() {
-        // The externally imported functions are UNSAFE by default
-        // because of untrusted source of other languages. You may
-        // wrap them in safe Rust APIs to ease the burden of callers.
-        //
-        // SAFETY: We know those functions are aliases of a safe
-        // Rust function.
-        unsafe {
-            my_demo_function(123);
-            my_demo_function_alias(456);
-        }
-    }
+extern "Rust" {  
+    fn my_demo_function(a: u32) -> u32;  
+    #[link_name = "my_demo_function"] //set a nickname and linked to my_demo_function  
+    fn my_demo_function_alias(a: u32) -> u32;  
+}  
+  
+mod Foo {  
+    // add pub so that function can be called outer,add extern to assign outer ABI,add #[no_mangle] to prevent its name changed  
+    #[no_mangle]  
+    pub extern fn my_demo_function(a: u32) -> u32 {  
+        a  
+    }  
+}  
+  
+#[cfg(test)]  
+mod tests {  
+    use super::*;  
+  
+    #[test]  
+    fn test_success() {    
+        unsafe {  
+            my_demo_function(123);  
+            my_demo_function_alias(456); // now this nickname will call the function my_demo_function  
+        }  
+    }  
 }
