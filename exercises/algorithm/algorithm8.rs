@@ -2,7 +2,6 @@
 	queue
 	This question requires you to use queues to implement the functionality of the stac
 */
-// I AM NOT DONE
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -52,31 +51,54 @@ impl<T> Default for Queue<T> {
     }
 }
 
-pub struct myStack<T>
-{
-	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
-}
-impl<T> myStack<T> {
-    pub fn new() -> Self {
-        Self {
-			//TODO
-			q1:Queue::<T>::new(),
-			q2:Queue::<T>::new()
-        }
-    }
-    pub fn push(&mut self, elem: T) {
-        //TODO
-    }
-    pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
-    }
-    pub fn is_empty(&self) -> bool {
-		//TODO
-        true
-    }
+pub struct myStack<T> {  
+    q1: Queue<T>,  
+    q2: Queue<T>,  
+}  
+  
+impl<T> myStack<T> {  
+    pub fn new() -> Self {  
+        Self {  
+            q1: Queue::new(),  
+            q2: Queue::new(),  
+        }  
+    }  
+  
+    pub fn push(&mut self, elem: T) {  
+        // always push the data into the empty queue or push into the first queue if both queues are empty
+        if self.q1.is_empty() && !self.q2.is_empty() {  
+            self.q2.enqueue(elem);  
+        } else {  
+            self.q1.enqueue(elem);  
+        }  
+    }  
+  
+    pub fn pop(&mut self) -> Result<T, &str> {  
+        // return false if both queues all empty
+        if self.q1.is_empty() && self.q2.is_empty() {  
+            return Err("Stack is empty");  
+        }  
+
+        if !self.q1.is_empty() {  
+            // move all the elements of q1 to q2 except the last one
+            while self.q1.size() > 1 {  
+                self.q2.enqueue(self.q1.dequeue().unwrap());  
+            }  
+            // pop the last of q1
+            return self.q1.dequeue();  
+        } else {  
+            // move all the elements of q2 to q1 except the last one
+            while self.q2.size() > 1 {  
+                self.q1.enqueue(self.q2.dequeue().unwrap());  
+            }  
+            //pop the last of q2 
+            return self.q2.dequeue();  
+        }  
+    }  
+  
+    pub fn is_empty(&self) -> bool {  
+        self.q1.is_empty() && self.q2.is_empty()  
+    }  
 }
 
 #[cfg(test)]
